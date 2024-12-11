@@ -1,6 +1,6 @@
-import "./globals.css";
+import "@/app/main.css";
 import { Cairo } from "next/font/google";
-
+import { Providers } from "@/app/storeProvider";
 const cairo = Cairo({ subsets: ["latin"] });
 
 
@@ -11,7 +11,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={cairo.className}>{children}</body>
+      <body className={cairo.className}><Providers>{children}</Providers></body>
     </html>
   );
 }
