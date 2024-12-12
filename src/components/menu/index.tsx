@@ -11,7 +11,7 @@ export default function Menu(props: {
   const { menus, indexChanger, selectedIndex } = props;
 
   return (
-    <div className="mx-auto max-w-7xl px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-6 lg:px-8" data-test-id="menu">
       <div className="flex items-center px-4 py-3 sm:px-6">
         <div className="flex flex-1 sm:hidden">
           <a
@@ -51,6 +51,7 @@ export default function Menu(props: {
                       className="relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 capitalize cursor-pointer"
                       onClick={() => indexChanger(index)}
                       key={index + 2}
+                      data-test-id={menu.key}
                     >
                       {menu.key}
                     </a>

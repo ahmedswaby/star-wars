@@ -10,7 +10,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className="flex flex-col min-w-screen">
       <body className={cairo.className}><Providers>{children}</Providers></body>
     </html>
   );

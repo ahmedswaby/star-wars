@@ -40,7 +40,7 @@ export default function Home() {
   return (
     <>
       {menu ? (
-        <main className="flex min-h-screen flex-col items-center p-24">
+        <main className="flex min-h-screen flex-col items-center sm:p-24">
           <div
             aria-hidden="true"
             className="absolute inset-0 grid grid-cols-2 -space-x-52 opacity-40 dark:opacity-20 -z-10"
@@ -61,7 +61,7 @@ export default function Home() {
             <p className="text-2xl font-semibold text-white mr-3">
               Loading...
             </p>
-            <RocketLaunchIcon className="h-8 w-8 text-white" />
+            <RocketLaunchIcon data-testid="rocket-icon" className="h-8 w-8 text-white" />
           </div>
         </main>
       )}
