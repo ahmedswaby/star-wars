@@ -2,17 +2,24 @@ import { GetPopulationChip, ModalPlanet } from "@/app/functions/planets";
 import { TableFooter, TableHeader } from "@/app/functions/table";
 import { Planet } from "@/interfaces/DTO";
 import { EyeIcon } from "@heroicons/react/24/outline";
-
 import { useEffect, useState } from "react";
 import { useGetPlantesQuery } from '@/app/store/apis'
+import { useDebounce } from '@/app/hooks/debounce';
+
 export default function SwapiPlanets() {
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1);
   const [maxPage, setMaxPage] = useState<string>("1");
   const [modalInfos, setModalInfos] = useState<Planet | undefined>();
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const { data: plantesData } = useGetPlantesQuery(currentPageNumber);
+  const debouncedSearchTerm = useDebounce(searchTerm, 750);
 
+  const { data: plantesData } = useGetPlantesQuery({ page: currentPageNumber, searchTerm: debouncedSearchTerm });
 
+  const handleSearch = (e: any) => {
+    setSearchTerm(e.target.value);
+    setCurrentPageNumber(1)
+  };
 
 
   useEffect(() => {
@@ -20,9 +27,7 @@ export default function SwapiPlanets() {
       var numberPages: number = plantesData?.count / 10;
 
       setMaxPage(
-        numberPages % 1 === 0
-          ? numberPages.toString()
-          : (numberPages + 1).toFixed(0)
+        Math.ceil(numberPages).toFixed(0)
       );
     }
   }, [plantesData]);
@@ -34,17 +39,24 @@ export default function SwapiPlanets() {
   };
 
   const nextPage = () => {
-    if (plantesData && plantesData?.next  && currentPageNumber !== Number(maxPage)) {
+    if (plantesData && plantesData?.next && currentPageNumber !== Number(maxPage)) {
       setCurrentPageNumber((prevNumber) => prevNumber + 1);
     }
   };
-  
+
   return (
     <>
       {modalInfos && (
         <ModalPlanet fSetterInfos={setModalInfos} infos={modalInfos} />
       )}
       <>
+        <input
+          type="text"
+          placeholder="Search characters..."
+          value={searchTerm}
+          onChange={handleSearch}
+          className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4 text-black"
+        />
         <table className="w-full border-collapse bg-white text-left text-sm text-gray-500">
           <TableHeader
             headers={[
@@ -60,65 +72,35 @@ export default function SwapiPlanets() {
             {plantesData
               ? plantesData.results &&
               plantesData.results.map((planet, index) => {
-                  return (
-                    <tr className="hover:bg-gray-50" key={planet.created}>
-                      <th className="flex gap-3 px-6 py-4 font-normal text-gray-900">
-                        <div className="font-medium text-gray-700">
-                          {planet.name}
-                        </div>
-                      </th>
-                      <td className="px-6 py-4">
-                        <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-600">
-                          {planet.climate}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="inline-flex items-center gap-1 rounded-full border-gray-600 px-2 py-1 text-xs font-semibold text-gray-600">
-                          {planet.gravity}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">{planet.terrain}</td>
-                      <td className="px-6 py-4">
-                        {GetPopulationChip(planet.population)}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex justify-center gap-4">
-                          <a
-                            onClick={() =>
-                              setModalInfos(plantesData.results[index])
-                            }
-                            className="cursor-pointer"
-                          >
-                            <EyeIcon
-                              className="block h-6 w-6"
-                              aria-hidden="true"
-                            />
-                          </a>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              : Array.from({ length: 10 }, (_, index) => (
-                  <tr className="hover:bg-gray-50" key={index}>
+                return (
+                  <tr className="hover:bg-gray-50" key={planet.created}>
                     <th className="flex gap-3 px-6 py-4 font-normal text-gray-900">
-                      <div className="animate-pulse bg-gray-200 h-6 w-40"></div>
+                      <div className="font-medium text-gray-700">
+                        {planet.name}
+                      </div>
                     </th>
                     <td className="px-6 py-4">
-                      <div className="animate-pulse bg-gray-200 h-6 w-40"></div>
+                      <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-600">
+                        {planet.climate}
+                      </span>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="animate-pulse bg-gray-200 h-6 w-40"></div>
+                      <span className="inline-flex items-center gap-1 rounded-full border-gray-600 px-2 py-1 text-xs font-semibold text-gray-600">
+                        {planet.gravity}
+                      </span>
                     </td>
+                    <td className="px-6 py-4">{planet.terrain}</td>
                     <td className="px-6 py-4">
-                      <div className="animate-pulse bg-gray-200 h-6 w-40"></div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="animate-pulse bg-gray-200 h-6 w-40"></div>
+                      {GetPopulationChip(planet.population)}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex justify-center gap-4">
-                        <a className="cursor-wait">
+                        <a
+                          onClick={() =>
+                            setModalInfos(plantesData.results[index])
+                          }
+                          className="cursor-pointer"
+                        >
                           <EyeIcon
                             className="block h-6 w-6"
                             aria-hidden="true"
@@ -127,7 +109,37 @@ export default function SwapiPlanets() {
                       </div>
                     </td>
                   </tr>
-                ))}
+                );
+              })
+              : Array.from({ length: 10 }, (_, index) => (
+                <tr className="hover:bg-gray-50" key={index}>
+                  <th className="flex gap-3 px-6 py-4 font-normal text-gray-900">
+                    <div className="animate-pulse bg-gray-200 h-6 w-40"></div>
+                  </th>
+                  <td className="px-6 py-4">
+                    <div className="animate-pulse bg-gray-200 h-6 w-40"></div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="animate-pulse bg-gray-200 h-6 w-40"></div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="animate-pulse bg-gray-200 h-6 w-40"></div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="animate-pulse bg-gray-200 h-6 w-40"></div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex justify-center gap-4">
+                      <a className="cursor-wait">
+                        <EyeIcon
+                          className="block h-6 w-6"
+                          aria-hidden="true"
+                        />
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
         <TableFooter

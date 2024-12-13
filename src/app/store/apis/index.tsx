@@ -16,39 +16,39 @@ export const starwarsAPI = createApi({
         method: "GET",
       }),
     }),
-    getPeople: builder.query<SPeople, number>({
-      query: (page) => ({
-        url: `/${apiRoot}/people?page=${page}`,
+    getPeople: builder.query<SPeople, {page: number; searchTerm: string | ''}>({
+      query: ({page , searchTerm}) => ({
+        url: `/${apiRoot}/people?page=${page}${searchTerm ? `&search=${searchTerm}` : ''}`,
         method: "GET",
       }),
     }),
-    getPlantes: builder.query<Planets, number>({
-      query: (page) => ({
-        url: `/${apiRoot}/planets?page=${page}`,
+    getPlantes: builder.query<Planets,  {page: number; searchTerm: string | ''}>({
+      query: ({page , searchTerm})  => ({
+        url: `/${apiRoot}/planets?page=${page}${searchTerm ? `&search=${searchTerm}` : ''}`,
         method: "GET",
       }),
     }),
-    getFilms: builder.query<SFilms, number>({
-      query: (page) => ({
-        url: `/${apiRoot}/films?page=${page}`,
+    getFilms: builder.query<SFilms, {page: number; searchTerm: string | ''}>({
+      query: ({page , searchTerm})  => ({
+        url: `/${apiRoot}/films?page=${page}${searchTerm ? `&search=${searchTerm}` : ''}`,
         method: "GET",
       }),
     }),
-    getSpecies: builder.query<Sspecies, number>({
-      query: (page) => ({
-        url: `/${apiRoot}/species?page=${page}`,
+    getSpecies: builder.query<Sspecies, {page: number; searchTerm: string | ''}>({
+      query:({page , searchTerm}) => ({
+        url: `/${apiRoot}/species?page=${page}${searchTerm ? `&search=${searchTerm}` : ''}`,
         method: "GET",
       }),
     }),
-    getVehicles: builder.query<Svehicles, number>({
-      query: (page) => ({
-        url: `/${apiRoot}/vehicles?page=${page}`,
+    getVehicles: builder.query<Svehicles, {page: number; searchTerm: string | ''}>({
+      query: ({page , searchTerm})  => ({
+        url: `/${apiRoot}/vehicles?page=${page}${searchTerm ? `&search=${searchTerm}` : ''}`,
         method: "GET",
       }),
     }),
-    getStarships: builder.query<Sstarships, number>({
-      query: (page) => ({
-        url: `/${apiRoot}/starships?page=${page}`,
+    getStarships: builder.query<Sstarships, {page: number; searchTerm: string | ''}>({
+      query: ({page , searchTerm})  => ({
+        url: `/${apiRoot}/starships?page=${page}${searchTerm ? `&search=${searchTerm}` : ''}`,
         method: "GET",
       }),
     }),
