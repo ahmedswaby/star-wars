@@ -1,34 +1,23 @@
 import { GetPopulationChip, ModalPlanet } from "@/app/functions/planets";
 import { TableFooter, TableHeader } from "@/app/functions/table";
-import { IDictionaryContent } from "@/interfaces/enums";
-import { Planet, Planets } from "@/interfaces/DTO";
+import { Planet } from "@/interfaces/DTO";
 import { EyeIcon } from "@heroicons/react/24/outline";
-import axios from "axios";
+
 import { useEffect, useState } from "react";
-
-export default function SwapiPlanets(props: { data: IDictionaryContent }) {
-  const { data } = props;
-
-  const [swapiPlanets, setSwapiPlanets] = useState<Planets>();
-  const [apiRequest, setApiRequest] = useState<string>(data.value);
+import { useGetPlantesQuery } from '@/app/store/apis'
+export default function SwapiPlanets() {
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1);
   const [maxPage, setMaxPage] = useState<string>("1");
   const [modalInfos, setModalInfos] = useState<Planet | undefined>();
 
-  useEffect(() => {
-    axios
-      .get<Planets>(apiRequest)
-      .then(function (response) {
-        setSwapiPlanets(response.data);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }, [apiRequest]);
+  const { data: plantesData } = useGetPlantesQuery(currentPageNumber);
+
+
+
 
   useEffect(() => {
-    if (swapiPlanets) {
-      var numberPages: number = swapiPlanets?.count / 10;
+    if (plantesData) {
+      var numberPages: number = plantesData?.count / 10;
 
       setMaxPage(
         numberPages % 1 === 0
@@ -36,29 +25,20 @@ export default function SwapiPlanets(props: { data: IDictionaryContent }) {
           : (numberPages + 1).toFixed(0)
       );
     }
-  }, [swapiPlanets]);
+  }, [plantesData]);
 
   const prevPage = () => {
-    if (swapiPlanets && swapiPlanets?.previous) {
-      setSwapiPlanets(undefined);
-      setApiRequest(swapiPlanets.previous);
+    if (plantesData && plantesData?.previous) {
       setCurrentPageNumber((prevNumber) => prevNumber - 1);
     }
   };
 
   const nextPage = () => {
-    if (swapiPlanets && swapiPlanets?.next) {
-      setSwapiPlanets(undefined);
-      setApiRequest(swapiPlanets.next);
+    if (plantesData && plantesData?.next  && currentPageNumber !== Number(maxPage)) {
       setCurrentPageNumber((prevNumber) => prevNumber + 1);
     }
   };
-
-  const totalPages = (numberItems: number) => {
-    var numberPages = numberItems / 10;
-    return numberPages % 1 === 0 ? numberPages : (numberPages + 1).toFixed(0);
-  };
-
+  
   return (
     <>
       {modalInfos && (
@@ -77,11 +57,11 @@ export default function SwapiPlanets(props: { data: IDictionaryContent }) {
             ]}
           />
           <tbody className="divide-y divide-gray-100 border-t border-gray-100">
-            {swapiPlanets
-              ? swapiPlanets.results &&
-                swapiPlanets.results.map((planet, index) => {
+            {plantesData
+              ? plantesData.results &&
+              plantesData.results.map((planet, index) => {
                   return (
-                    <tr className="hover:bg-gray-50" key={index}>
+                    <tr className="hover:bg-gray-50" key={planet.created}>
                       <th className="flex gap-3 px-6 py-4 font-normal text-gray-900">
                         <div className="font-medium text-gray-700">
                           {planet.name}
@@ -105,7 +85,7 @@ export default function SwapiPlanets(props: { data: IDictionaryContent }) {
                         <div className="flex justify-center gap-4">
                           <a
                             onClick={() =>
-                              setModalInfos(swapiPlanets.results[index])
+                              setModalInfos(plantesData.results[index])
                             }
                             className="cursor-pointer"
                           >

@@ -1,55 +1,41 @@
 import { TableFooter, TableHeader } from "@/app/functions/table";
 import { IDictionaryContent } from "@/interfaces/enums";
-import { Sstarships , Starship } from "@/interfaces/DTO";
+import { Starship } from "@/interfaces/DTO";
 import { EyeIcon } from "@heroicons/react/24/outline";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { ModalStarship } from "@/app/functions/starship";
+import { useGetStarshipsQuery } from '@/app/store/apis';
 
-export default function Starships(props: { data: IDictionaryContent }) {
-  const { data } = props;
-  const [starships, setstarships] = useState<Sstarships>();
-  const [apiRequest, setApiRequest] = useState<string>(data.value);
+export default function Starships() {
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1);
   const [maxPage, setMaxPage] = useState<string>("1");
   const [modalInfos, setModalInfos] = useState<Starship | undefined>();
 
-  useEffect(() => {
-    axios
-      .get<Sstarships>(apiRequest)
-      .then(function (response) {
-        setstarships(response.data);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }, [apiRequest]);
+  const { data: starships } = useGetStarshipsQuery(currentPageNumber);
+  
 
   useEffect(() => {
     if (starships) {
       var numberPages: number = starships?.count / 10;
-
-      numberPages > 10 &&
+      numberPages &&
         setMaxPage(
           numberPages % 1 === 0
             ? numberPages.toString()
-            : (numberPages + 1).toFixed(0)
+            : (numberPages).toFixed(0)
         );
     }
   }, [starships]);
 
   const prevPage = () => {
     if (starships && starships?.previous) {
-        setstarships(undefined);
-      setApiRequest(starships.previous);
+     
       setCurrentPageNumber((prevNumber) => prevNumber - 1);
     }
   };
 
   const nextPage = () => {
-    if (starships && starships?.next) {
-        setstarships(undefined);
-      setApiRequest(starships.next);
+    if (starships && starships?.next && currentPageNumber !== Number(maxPage)) {
+
       setCurrentPageNumber((prevNumber) => prevNumber + 1);
     }
   };

@@ -1,55 +1,41 @@
 import { ModalSpecies } from "@/app/functions/specie";
 import { TableFooter, TableHeader } from "@/app/functions/table";
 import { IDictionaryContent } from "@/interfaces/enums";
-import { Sspecies , Specie } from "@/interfaces/DTO";
-import { EyeIcon } from "@heroicons/react/24/outline";
-import axios from "axios";
+import { Specie } from "@/interfaces/DTO";
+import { EyeIcon } from "@heroicons/react/24/outline";;
 import { useEffect, useState } from "react";
+import { useGetSpeciesQuery } from "@/app/store/apis";
 
-export default function Species(props: { data: IDictionaryContent }) {
-  const { data } = props;
-  const [species, setSpecies] = useState<Sspecies>();
-  const [apiRequest, setApiRequest] = useState<string>(data.value);
+export default function Species() {
+  
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1);
   const [maxPage, setMaxPage] = useState<string>("1");
   const [modalInfos, setModalInfos] = useState<Specie | undefined>();
 
-  useEffect(() => {
-    axios
-      .get<Sspecies>(apiRequest)
-      .then(function (response) {
-        setSpecies(response.data);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }, [apiRequest]);
+  const { data: species } = useGetSpeciesQuery(currentPageNumber);
+
 
   useEffect(() => {
     if (species) {
       var numberPages: number = species?.count / 10;
-
-      numberPages > 10 &&
+      
+      numberPages  &&
         setMaxPage(
           numberPages % 1 === 0
             ? numberPages.toString()
-            : (numberPages + 1).toFixed(0)
+            : (numberPages).toFixed(0)
         );
     }
   }, [species]);
 
   const prevPage = () => {
     if (species && species?.previous) {
-        setSpecies(undefined);
-      setApiRequest(species.previous);
       setCurrentPageNumber((prevNumber) => prevNumber - 1);
     }
   };
 
   const nextPage = () => {
-    if (species && species?.next) {
-        setSpecies(undefined);
-      setApiRequest(species.next);
+    if (species && species?.next  && currentPageNumber !== Number(maxPage)) {
       setCurrentPageNumber((prevNumber) => prevNumber + 1);
     }
   };

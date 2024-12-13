@@ -5,7 +5,7 @@ import NotImplementedMenu from "@/components/list/notimplemented";
 import People from "@/components/list/people";
 import Planets from "@/components/list/planets";
 import Species from "@/components/list/species";
-import Vehicles from "@/components/list/vechiles";
+import Vehicles from "@/components/list/vehicles";
 import Starships from "@/components/list/starships";
 import { IDictionaryContent } from "@/interfaces/enums";
 
@@ -14,19 +14,17 @@ export default function Tabs(props: { menu: IDictionaryContent }) {
 
   switch (menu.key) {
     case "people":
-      return <People data={menu} />;
+      return <People />;
     case "planets":
-      return <Planets data={menu} />;
+      return <Planets />;
     case "films":
-      return <Films data={menu} />;
+      return <Films />;
     case "species":
-      return <Species data={menu} />;
-    case "species":
-      return <Species data={menu} />;
+      return <Species />;
     case "vehicles":
-      return <Vehicles data={menu} />;
+      return <Vehicles />;
     case "starships":
-      return <Starships data={menu} />;
+      return <Starships />;
 
     default:
       return <NotImplementedMenu />;

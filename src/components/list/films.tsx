@@ -5,25 +5,15 @@ import { Film, SFilms } from "@/interfaces/DTO";
 import { EyeIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useGetFilmsQuery } from '@/app/store/apis'
 
-export default function Films(props: { data: IDictionaryContent }) {
-  const { data } = props;
-  const [films, setFilms] = useState<SFilms>();
-  const [apiRequest, setApiRequest] = useState<string>(data.value);
+export default function Films() {
+
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1);
   const [maxPage, setMaxPage] = useState<string>("1");
   const [modalInfos, setModalInfos] = useState<Film | undefined>();
+  const { data: films } = useGetFilmsQuery(currentPageNumber);
 
-  useEffect(() => {
-    axios
-      .get<SFilms>(apiRequest)
-      .then(function (response) {
-        setFilms(response.data);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }, [apiRequest]);
 
   useEffect(() => {
     if (films) {
@@ -40,16 +30,13 @@ export default function Films(props: { data: IDictionaryContent }) {
 
   const prevPage = () => {
     if (films && films?.previous) {
-        setFilms(undefined);
-      setApiRequest(films.previous);
+   
       setCurrentPageNumber((prevNumber) => prevNumber - 1);
     }
   };
 
   const nextPage = () => {
     if (films && films?.next) {
-        setFilms(undefined);
-      setApiRequest(films.next);
       setCurrentPageNumber((prevNumber) => prevNumber + 1);
     }
   };

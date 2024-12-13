@@ -5,51 +5,35 @@ import { EyeIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { ModalVehicle } from "@/app/functions/vechile";
+import { useGetVehiclesQuery } from '@/app/store/apis';
 
-export default function Vehicles(props: { data: IDictionaryContent }) {
-  const { data } = props;
-  const [vehicles, setVehicles] = useState<Svehicles>();
-  const [apiRequest, setApiRequest] = useState<string>(data.value);
+export default function Vehicles() {
+
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1);
   const [maxPage, setMaxPage] = useState<string>("1");
   const [modalInfos, setModalInfos] = useState<Vehicle | undefined>();
 
-  useEffect(() => {
-    axios
-      .get<Svehicles>(apiRequest)
-      .then(function (response) {
-        setVehicles(response.data);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }, [apiRequest]);
+  const { data: vehicles } = useGetVehiclesQuery(currentPageNumber);
 
   useEffect(() => {
     if (vehicles) {
-      var numberPages: number = vehicles?.count / 10;
-
-      numberPages > 10 &&
+      let numberPages: number = vehicles?.count / 10;
         setMaxPage(
           numberPages % 1 === 0
             ? numberPages.toString()
-            : (numberPages + 1).toFixed(0)
+            : (numberPages).toFixed(0)
         );
     }
   }, [vehicles]);
 
   const prevPage = () => {
     if (vehicles && vehicles?.previous) {
-        setVehicles(undefined);
-      setApiRequest(vehicles.previous);
       setCurrentPageNumber((prevNumber) => prevNumber - 1);
     }
   };
 
   const nextPage = () => {
-    if (vehicles && vehicles?.next) {
-        setVehicles(undefined);
-      setApiRequest(vehicles.next);
+    if (vehicles && vehicles?.next && currentPageNumber !== Number(maxPage)) {
       setCurrentPageNumber((prevNumber) => prevNumber + 1);
     }
   };

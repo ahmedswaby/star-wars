@@ -2,55 +2,42 @@
 import { GetGenderChip } from "@/app/functions/characters";
 import { ModalPeople } from "@/app/functions/people";
 import { TableFooter, TableHeader } from "@/app/functions/table";
-import { IDictionaryContent } from "@/interfaces/enums";
-import { Character, SPeople } from "@/interfaces/DTO";
+import { Character } from "@/interfaces/DTO";
 import { EyeIcon } from "@heroicons/react/24/outline";
-import axios from "axios";
 import { useEffect, useState } from "react";
+import { useGetPeopleQuery } from '@/app/store/apis';
 
-export default function People(props: { data: IDictionaryContent }) {
-  const { data } = props;
-  const [People, setPeople] = useState<SPeople>();
-  const [apiRequest, setApiRequest] = useState<string>(data.value);
+export default function People() {
+
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1);
   const [maxPage, setMaxPage] = useState<string>("1");
   const [modalInfos, setModalInfos] = useState<Character | undefined>();
 
-  useEffect(() => {
-    axios
-      .get<SPeople>(apiRequest)
-      .then(function (response) {
-        setPeople(response.data);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }, [apiRequest]);
+  const { data: poeple } = useGetPeopleQuery(currentPageNumber);
+
 
   useEffect(() => {
-    if (People) {
-      var numberPages: number = People?.count / 10;
-
+    if(poeple) {
+      let numberPages: number = poeple?.count / 10;
       setMaxPage(
         numberPages % 1 === 0
           ? numberPages.toString()
           : (numberPages + 1).toFixed(0)
       );
     }
-  }, [People]);
+  }, [poeple])
+  
+  
+
 
   const prevPage = () => {
-    if (People && People?.previous) {
-      setPeople(undefined);
-      setApiRequest(People.previous);
+    if (poeple && poeple?.previous) {
       setCurrentPageNumber((prevNumber) => prevNumber - 1);
     }
   };
 
   const nextPage = () => {
-    if (People && People?.next) {
-      setPeople(undefined);
-      setApiRequest(People.next);
+    if (poeple && poeple?.next) {
       setCurrentPageNumber((prevNumber) => prevNumber + 1);
     }
   };
@@ -67,11 +54,11 @@ export default function People(props: { data: IDictionaryContent }) {
           />
 
           <tbody className="divide-y divide-gray-100 border-t border-gray-100">
-            {People
-              ? People.results &&
-                People.results.map((character, index) => {
+            {poeple
+              ? poeple.results &&
+              poeple.results.map((character, index) => {
                   return (
-                    <tr className="hover:bg-gray-50" key={index}>
+                    <tr className="hover:bg-gray-50" key={character.created}>
                       <th className="flex gap-3 px-6 py-4 font-normal text-gray-900">
                         <div className="font-medium text-gray-700">
                           {character.name}
@@ -94,7 +81,7 @@ export default function People(props: { data: IDictionaryContent }) {
                         <div className="flex justify-center gap-4">
                           <a
                             onClick={() =>
-                              setModalInfos(People.results[index])
+                              setModalInfos(poeple.results[index])
                             }
                             className="cursor-pointer"
                           >

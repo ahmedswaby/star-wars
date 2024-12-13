@@ -1,14 +1,17 @@
-"use client";
-import { combineReducers, configureStore  } from "@reduxjs/toolkit";
-import counterReducer from "./couner";
+import { configureStore } from "@reduxjs/toolkit";
+import { useDispatch } from "react-redux";
+import { starwarsAPI } from "./apis/index";
 
+const store = configureStore({
+  reducer: {
+    [starwarsAPI.reducerPath]: starwarsAPI.reducer,
+  },
+  devTools: true,
 
-const rootReducer = combineReducers({
-  counter: counterReducer,
-  //add all your reducers here
-},);
-
-export const store = configureStore({
-  reducer: rootReducer,
-
- });
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware({ serializableCheck: false })
+      .concat(starwarsAPI.middleware)
+});
+export type AppDispatch = typeof store.dispatch;
+export const useAppDispatch: () => AppDispatch = useDispatch;
+export default store;

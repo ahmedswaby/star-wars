@@ -4,11 +4,12 @@ import { IDictionaryContent } from '@/interfaces/enums';
 import Menu from "@/components/menu/index";
 import Tabs from "@/components/menu/tabs";
 import { RocketLaunchIcon } from "@heroicons/react/24/outline";
-import axios from "axios";
+import { useGetApisQuery } from './store/apis';
 
 export default function Home() {
+  
   const [menu, setMenu] = useState<IDictionaryContent[]>();
-
+  const { data } = useGetApisQuery()
   const [index, setIndex] = useState<number>(0);
 
   const changeIndex = (number: number) => {
@@ -18,23 +19,18 @@ export default function Home() {
   };
 
   useEffect(() => {
-    axios
-      .get<Record<string, string>>(`https://swapi.dev/api/`)
-      .then(function (response) {
-        var mappedDictionary: IDictionaryContent[] = Object.entries(
-          response.data
-        ).map(([key, value]) => {
-          return {
-            key,
-            value,
-          };
-        });
-        setMenu(mappedDictionary);
-      })
-      .catch(function (error) {
-        console.log(error);
+    if(data) {
+      let mappedDictionary: IDictionaryContent[] = Object.entries(
+        data
+      ).map(([key, value]) => {
+        return {
+          key,
+          value,
+        };
       });
-  }, []);
+      setMenu(mappedDictionary);
+    }
+  }, [data]);
 
 
   return (
@@ -49,6 +45,7 @@ export default function Home() {
             <div className="blur-[106px] h-64 bg-gradient-to-r from-purple-400 to-cyan-300 dark:to-indigo-600"></div>
           </div>
           <Menu
+            data-testid="menu"
             menus={menu}
             indexChanger={changeIndex}
             selectedIndex={index}

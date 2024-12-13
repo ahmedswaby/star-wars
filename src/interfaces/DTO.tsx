@@ -15,6 +15,7 @@ interface SData {
     mass: string;
     gender: string;
     url: string;
+    created: string;
   }
   
   export interface User {
@@ -34,6 +35,7 @@ interface SData {
     gravity: string;
     terrain: string;
     population: string;
+    created: string;
   }
   //Films
   export interface SFilms extends SData {
@@ -48,6 +50,7 @@ interface SData {
     producer: string;
     release_date: Date;
     opening_crawl: string;
+    created: string;
   }
  
   //Species
@@ -60,6 +63,7 @@ interface SData {
     classification: string;
     designation: string;
     language: string;
+    created: string;
   }
 
   
@@ -74,6 +78,7 @@ interface SData {
     model: string;
     max_atmosphering_speed: string;
     crew: string;
+    created: string;
   }
 
 
